@@ -672,12 +672,12 @@ pub fn build(b: *std.Build) !void {
 
     if (linkage == .static) {
         try angle_def.appendSlice(b.allocator, &.{
-            "ANGLE_EXPORT=",
-            "ANGLE_STATIC=1",
-            "ANGLE_UTIL_EXPORT=",
-            "EGLAPI=",
-            "GL_APICALL=",
-            "GL_API=",
+            "-DANGLE_EXPORT=",
+            "-DANGLE_STATIC=1",
+            "-DANGLE_UTIL_EXPORT=",
+            "-DEGLAPI=",
+            "-DGL_APICALL=",
+            "-DGL_API=",
         });
     }
 
