@@ -1026,7 +1026,7 @@ pub fn build(b: *std.Build) !void {
     }
     b.installArtifact(libANGLE);
 
-    const need_prefix = target.result.libPrefix().len == 0;
+    const need_prefix = linkage == .dynamic and target.result.libPrefix().len == 0;
 
     const libGLESv2 = b.addLibrary(.{
         .linkage = linkage,
