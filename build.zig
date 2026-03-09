@@ -571,36 +571,36 @@ pub fn build(b: *std.Build) !void {
     });
     var glslang_files = b.addWriteFiles();
     _ = glslang_files.add("glslang/build_info.h", b.fmt(
-            \\#ifndef GLSLANG_BUILD_INFO
-            \\#define GLSLANG_BUILD_INFO
-            \\
-            \\#define GLSLANG_VERSION_MAJOR {}
-            \\#define GLSLANG_VERSION_MINOR {}
-            \\#define GLSLANG_VERSION_PATCH {}
-            \\#define GLSLANG_VERSION_FLAVOR ""
-            \\
-            \\#define GLSLANG_VERSION_GREATER_THAN(major, minor, patch) \
-            \\    ((GLSLANG_VERSION_MAJOR) > (major) || ((major) == GLSLANG_VERSION_MAJOR && \
-            \\    ((GLSLANG_VERSION_MINOR) > (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
-            \\     (GLSLANG_VERSION_PATCH) > (patch)))))
-            \\
-            \\#define GLSLANG_VERSION_GREATER_OR_EQUAL_TO(major, minor, patch) \
-            \\    ((GLSLANG_VERSION_MAJOR) > (major) || ((major) == GLSLANG_VERSION_MAJOR && \
-            \\    ((GLSLANG_VERSION_MINOR) > (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
-            \\     (GLSLANG_VERSION_PATCH >= (patch))))))
-            \\
-            \\#define GLSLANG_VERSION_LESS_THAN(major, minor, patch) \
-            \\    ((GLSLANG_VERSION_MAJOR) < (major) || ((major) == GLSLANG_VERSION_MAJOR && \
-            \\    ((GLSLANG_VERSION_MINOR) < (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
-            \\     (GLSLANG_VERSION_PATCH) < (patch)))))
-            \\
-            \\#define GLSLANG_VERSION_LESS_OR_EQUAL_TO(major, minor, patch) \
-            \\    ((GLSLANG_VERSION_MAJOR) < (major) || ((major) == GLSLANG_VERSION_MAJOR && \
-            \\    ((GLSLANG_VERSION_MINOR) < (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
-            \\     (GLSLANG_VERSION_PATCH <= (patch))))))
-            \\
-            \\#endif // GLSLANG_BUILD_INFO
-            , .{16, 1, 0} // TODO: automate somehow
+        \\#ifndef GLSLANG_BUILD_INFO
+        \\#define GLSLANG_BUILD_INFO
+        \\
+        \\#define GLSLANG_VERSION_MAJOR {}
+        \\#define GLSLANG_VERSION_MINOR {}
+        \\#define GLSLANG_VERSION_PATCH {}
+        \\#define GLSLANG_VERSION_FLAVOR ""
+        \\
+        \\#define GLSLANG_VERSION_GREATER_THAN(major, minor, patch) \
+        \\    ((GLSLANG_VERSION_MAJOR) > (major) || ((major) == GLSLANG_VERSION_MAJOR && \
+        \\    ((GLSLANG_VERSION_MINOR) > (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
+        \\     (GLSLANG_VERSION_PATCH) > (patch)))))
+        \\
+        \\#define GLSLANG_VERSION_GREATER_OR_EQUAL_TO(major, minor, patch) \
+        \\    ((GLSLANG_VERSION_MAJOR) > (major) || ((major) == GLSLANG_VERSION_MAJOR && \
+        \\    ((GLSLANG_VERSION_MINOR) > (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
+        \\     (GLSLANG_VERSION_PATCH >= (patch))))))
+        \\
+        \\#define GLSLANG_VERSION_LESS_THAN(major, minor, patch) \
+        \\    ((GLSLANG_VERSION_MAJOR) < (major) || ((major) == GLSLANG_VERSION_MAJOR && \
+        \\    ((GLSLANG_VERSION_MINOR) < (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
+        \\     (GLSLANG_VERSION_PATCH) < (patch)))))
+        \\
+        \\#define GLSLANG_VERSION_LESS_OR_EQUAL_TO(major, minor, patch) \
+        \\    ((GLSLANG_VERSION_MAJOR) < (major) || ((major) == GLSLANG_VERSION_MAJOR && \
+        \\    ((GLSLANG_VERSION_MINOR) < (minor) || ((minor) == GLSLANG_VERSION_MINOR && \
+        \\     (GLSLANG_VERSION_PATCH <= (patch))))))
+        \\
+        \\#endif // GLSLANG_BUILD_INFO
+    , .{ 16, 1, 0 } // TODO: automate somehow
     ));
     glslang.root_module.addIncludePath(glslang_files.getDirectory());
     glslang.root_module.addIncludePath(glslang_dep.path(""));
