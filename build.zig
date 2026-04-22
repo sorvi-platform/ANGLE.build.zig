@@ -1,4 +1,5 @@
 const std = @import("std");
+const meta = @import("meta.zon");
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
@@ -311,6 +312,7 @@ pub fn build(b: *std.Build) !void {
                 "src/compiler/translator/tree_ops/msl/GuardFragDepthWrite.cpp",
                 "src/compiler/translator/tree_ops/msl/HoistConstants.cpp",
                 "src/compiler/translator/tree_ops/msl/IntroduceVertexIndexID.cpp",
+                "src/compiler/translator/tree_ops/msl/RescopeGlobalVariables.cpp",
                 "src/compiler/translator/tree_ops/msl/RewriteCaseDeclarations.cpp",
                 "src/compiler/translator/tree_ops/msl/RewriteInterpolants.cpp",
                 "src/compiler/translator/tree_ops/msl/RewriteOutArgs.cpp",
@@ -682,18 +684,16 @@ pub fn build(b: *std.Build) !void {
     }
 
     var angle_files = b.addWriteFiles();
-    _ = angle_files.add("ANGLEShaderProgramVersion.h",
-        // TODO: automate somehow
-        \\#define ANGLE_PROGRAM_VERSION "d078f9a81d91c7a2907117d1489c88db"
+    _ = angle_files.add("ANGLEShaderProgramVersion.h", b.fmt(
+        \\#define ANGLE_PROGRAM_VERSION "{s}"
         \\#define ANGLE_PROGRAM_VERSION_HASH_SIZE 16
-    );
-    _ = angle_files.add("angle_commit.h",
-        // TODO: this shit probably does not matter
-        \\#define ANGLE_COMMIT_HASH "49658850af8a"
+    , .{meta.angle_rev}));
+    _ = angle_files.add("angle_commit.h", b.fmt(
+        \\#define ANGLE_COMMIT_HASH "{s}"
         \\#define ANGLE_COMMIT_HASH_SIZE 12
-        \\#define ANGLE_COMMIT_DATE "what year is it?"
+        \\#define ANGLE_COMMIT_DATE "{s}"
         \\#define ANGLE_COMMIT_POSITION 0
-    );
+    , .{ meta.angle_rev[0..12], meta.angle_date }));
 
     const libANGLE = b.addLibrary(.{
         .linkage = .static,
@@ -720,7 +720,7 @@ pub fn build(b: *std.Build) !void {
     });
     libANGLE.root_module.addCSourceFiles(.{
         .flags = concat(b, &.{
-            &.{"-fvisibility=hidden"},
+            &.{ "-std=c++20", "-fvisibility=hidden" },
             angle_def.items,
         }),
         .files = angle_src.items,
@@ -729,7 +729,7 @@ pub fn build(b: *std.Build) !void {
     });
     libANGLE.root_module.addCSourceFiles(.{
         .flags = concat(b, &.{
-            &.{"-fvisibility=hidden"},
+            &.{ "-std=c++20", "-fvisibility=hidden" },
             angle_def.items,
         }),
         .files = angle_objc.items,
@@ -738,7 +738,7 @@ pub fn build(b: *std.Build) !void {
     });
     libANGLE.root_module.addCSourceFiles(.{
         .flags = concat(b, &.{
-            &.{"-fvisibility=hidden"},
+            &.{ "-std=c++20", "-fvisibility=hidden" },
             angle_def.items,
         }),
         .files = &.{
@@ -907,8 +907,6 @@ pub fn build(b: *std.Build) !void {
             "src/compiler/translator/Types.cpp",
             "src/compiler/translator/ValidateAST.cpp",
             "src/compiler/translator/ValidateGlobalInitializer.cpp",
-            "src/compiler/translator/ValidateOutputs.cpp",
-            "src/compiler/translator/ValidateTypeSizeLimitations.cpp",
             "src/compiler/translator/ValidateVaryingLocations.cpp",
             "src/compiler/translator/VariablePacker.cpp",
             "src/compiler/translator/blocklayout.cpp",
@@ -938,7 +936,6 @@ pub fn build(b: *std.Build) !void {
             "src/compiler/translator/tree_ops/RemoveInvariantDeclaration.cpp",
             "src/compiler/translator/tree_ops/RemoveUnreferencedVariables.cpp",
             "src/compiler/translator/tree_ops/RemoveUnusedFramebufferFetch.cpp",
-            "src/compiler/translator/tree_ops/RescopeGlobalVariables.cpp",
             "src/compiler/translator/tree_ops/RewriteArrayOfArrayOfOpaqueUniforms.cpp",
             "src/compiler/translator/tree_ops/RewriteAtomicCounters.cpp",
             "src/compiler/translator/tree_ops/RewriteDfdy.cpp",
