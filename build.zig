@@ -17,15 +17,15 @@ pub fn build(b: *std.Build) !void {
     const astc_dep = b.dependency("astc-encoder", .{});
     const glslang_dep = b.dependency("glslang", .{});
 
-    var angle_def: std.ArrayListUnmanaged([]const u8) = .empty;
-    var angle_src: std.ArrayListUnmanaged([]const u8) = .empty;
-    var angle_csrc: std.ArrayListUnmanaged([]const u8) = .empty;
-    var angle_objc: std.ArrayListUnmanaged([]const u8) = .empty;
-    var angle_frameworks: std.ArrayListUnmanaged([]const u8) = .empty;
-    var angle_libs: std.ArrayListUnmanaged([]const u8) = .empty;
-    var angle_incl: std.ArrayListUnmanaged(std.Build.LazyPath) = .empty;
-    var glslang_def: std.ArrayListUnmanaged([]const u8) = .empty;
-    var glslang_src: std.ArrayListUnmanaged([]const u8) = .empty;
+    var angle_def: std.ArrayList([]const u8) = .empty;
+    var angle_src: std.ArrayList([]const u8) = .empty;
+    var angle_csrc: std.ArrayList([]const u8) = .empty;
+    var angle_objc: std.ArrayList([]const u8) = .empty;
+    var angle_frameworks: std.ArrayList([]const u8) = .empty;
+    var angle_libs: std.ArrayList([]const u8) = .empty;
+    var angle_incl: std.ArrayList(std.Build.LazyPath) = .empty;
+    var glslang_def: std.ArrayList([]const u8) = .empty;
+    var glslang_src: std.ArrayList([]const u8) = .empty;
     switch (target.result.os.tag) {
         .linux => {
             if (b.lazyDependency("vulkan-headers", .{})) |dep| {
@@ -1115,8 +1115,8 @@ pub fn build(b: *std.Build) !void {
     libEGL.root_module.addIncludePath(angle_dep.path("src/common/base"));
     libEGL.root_module.addIncludePath(angle_dep.path("src/common/third_party/xxhash"));
 
-    var egl_def: std.ArrayListUnmanaged([]const u8) = .empty;
-    var egl_src: std.ArrayListUnmanaged([]const u8) = .empty;
+    var egl_def: std.ArrayList([]const u8) = .empty;
+    var egl_src: std.ArrayList([]const u8) = .empty;
 
     if (linkage == .dynamic) {
         try egl_def.appendSlice(b.allocator, &.{
