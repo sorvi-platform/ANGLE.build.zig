@@ -64,7 +64,7 @@ zig fetch --save=angle --global-cache-dir "$tmpdir" "git+${src[angle]}#${angle_r
 cp -f build.zig.zon "$pwd/build.zig.zon"
 cat <<EOF > "$pwd/meta.zon"
 .{
-  .angle_rev = "${angle_rev}",
-  .angle_date = "${angle_date}",
+    .angle_rev = "${angle_rev}",
+    .angle_date = "${angle_date}",
 }
 EOF
