@@ -1,9 +1,49 @@
 const std = @import("std");
 
+const not_std = struct {
+    pub fn once(comptime f: fn () void) Once(f) {
+        return Once(f){};
+    }
+
+    /// An object that executes the function `f` just once.
+    /// It is undefined behavior if `f` re-enters the same Once instance.
+    pub fn Once(comptime f: fn () void) type {
+        return struct {
+            done: bool = false,
+            mutex: std.Io.Mutex = .init,
+
+            /// Call the function `f`.
+            /// If `call` is invoked multiple times `f` will be executed only the
+            /// first time.
+            /// The invocations are thread-safe.
+            pub fn call(self: *@This()) void {
+                if (@atomicLoad(bool, &self.done, .acquire))
+                    return;
+
+                return self.callSlow();
+            }
+
+            fn callSlow(self: *@This()) void {
+                @branchHint(.cold);
+
+                const io = std.Io.Threaded.global_single_threaded.io();
+                self.mutex.lockUncancelable(io);
+                defer self.mutex.unlock(io);
+
+                // The first thread to acquire the mutex gets to run the initializer
+                if (!self.done) {
+                    f();
+                    @atomicStore(bool, &self.done, true, .release);
+                }
+            }
+        };
+    }
+};
+
 fn SoWrapper(FNS: type, paths: []const [:0]const u8) type {
     return struct {
         var _impl: FNS = undefined;
-        var _once = std.once(once);
+        var _once = if (@hasDecl(std, "once")) std.once(once) else not_std.once(once);
 
         fn once() void {
             var so: ?*anyopaque = null;
