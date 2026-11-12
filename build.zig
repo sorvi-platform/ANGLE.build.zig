@@ -243,6 +243,13 @@ pub fn build(b: *std.Build) !void {
                 "-D__APPLE__",
                 "-DANGLE_ENABLE_METAL",
             });
+            if (@import("builtin").zig_version.minor >= 17) {
+                try angle_def.appendSlice(b.allocator, &.{
+                    "-DINFINITY=HUGE_VALF",
+                    "-DDBL_MAX=__DBL_MAX__",
+                    "-DFLT_MAX=__FLT_MAX__",
+                });
+            }
             try angle_objc.appendSlice(b.allocator, &.{
                 "src/common/apple_platform_utils.mm",
                 "src/libANGLE/renderer/metal/BufferMtl.mm",
