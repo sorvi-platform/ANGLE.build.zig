@@ -5,6 +5,7 @@ pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const maybe_sysroot = b.option(std.Build.LazyPath, "sysroot", "Sysroot for cross-compilation (needed on some targets)");
     const linkage = b.option(std.builtin.LinkMode, "linkage", "Link mode for library artifacts") orelse .static;
 
     const angle_dep = b.dependency("angle", .{});
@@ -704,7 +705,7 @@ pub fn build(b: *std.Build) !void {
             .link_libcpp = true,
         }),
     });
-    macosCrossWorkaround(b, libANGLE.root_module);
+    macosCrossWorkaround(b, maybe_sysroot, libANGLE.root_module);
     libANGLE.root_module.addIncludePath(angle_files.getDirectory());
     libANGLE.root_module.addIncludePath(angle_dep.path("include"));
     libANGLE.root_module.addIncludePath(angle_dep.path("src"));
@@ -1034,7 +1035,7 @@ pub fn build(b: *std.Build) !void {
             .link_libcpp = true,
         }),
     });
-    macosCrossWorkaround(b, libGLESv2.root_module);
+    macosCrossWorkaround(b, maybe_sysroot, libGLESv2.root_module);
     libGLESv2.root_module.addIncludePath(angle_dep.path("include"));
     libGLESv2.root_module.addIncludePath(angle_dep.path("src"));
     libGLESv2.root_module.addIncludePath(angle_dep.path("src/common/base"));
@@ -1080,7 +1081,7 @@ pub fn build(b: *std.Build) !void {
             .link_libcpp = true,
         }),
     });
-    macosCrossWorkaround(b, libGLESv1_CM.root_module);
+    macosCrossWorkaround(b, maybe_sysroot, libGLESv1_CM.root_module);
     libGLESv1_CM.root_module.addIncludePath(angle_dep.path("include"));
     libGLESv1_CM.root_module.addIncludePath(angle_dep.path("src"));
     libGLESv1_CM.root_module.addCSourceFiles(.{
@@ -1109,7 +1110,7 @@ pub fn build(b: *std.Build) !void {
             .link_libcpp = true,
         }),
     });
-    macosCrossWorkaround(b, libEGL.root_module);
+    macosCrossWorkaround(b, maybe_sysroot, libEGL.root_module);
     libEGL.root_module.addIncludePath(angle_dep.path("include"));
     libEGL.root_module.addIncludePath(angle_dep.path("src"));
     libEGL.root_module.addIncludePath(angle_dep.path("src/common/base"));
@@ -1164,17 +1165,17 @@ fn concat(b: *std.Build, slices: []const []const []const u8) []const []const u8 
     return std.mem.concat(b.allocator, []const u8, slices) catch @panic("OOM");
 }
 
-fn macosCrossWorkaround(b: *std.Build, module: *std.Build.Module) void {
+fn macosCrossWorkaround(b: *std.Build, maybe_sysroot: ?std.Build.LazyPath, module: *std.Build.Module) void {
     const target = module.resolved_target.?;
     switch (target.result.os.tag) {
         .macos, .ios, .tvos, .watchos, .visionos => {},
         else => return,
     }
-    if (b.sysroot) |sysroot| {
-        module.addSystemIncludePath(.{ .cwd_relative = b.pathJoin(&.{ sysroot, "usr/include" }) });
-        module.addSystemFrameworkPath(.{ .cwd_relative = b.pathJoin(&.{ sysroot, "System/Library/Frameworks" }) });
+    if (maybe_sysroot) |sysroot| {
+        module.addSystemIncludePath(sysroot.path(b, "usr/include"));
+        module.addLibraryPath(sysroot.path(b, "usr/lib"));
+        module.addSystemFrameworkPath(sysroot.path(b, "System/Library/Frameworks"));
     } else if (!target.query.isNative()) {
-        std.log.err("'--sysroot' is required when building ANGLE for non-native macOS targets", .{});
-        std.process.exit(1);
+        @panic("'-Dsysroot=<path to macos sdk>' is required when building ANGLE for non-native macOS targets");
     }
 }
